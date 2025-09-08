@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Excuse Generator</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #DAF1DE 0%, #8EB898 100%);
+            min-height: 100vh;
+            color: #0B2826;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #0B2826;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.2em;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .input-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        input {
+            width: 100%;
+            padding: 20px;
+            border: 3px solid #8EB898;
+            border-radius: 15px;
+            font-size: 18px;
+            margin-bottom: 20px;
+            background: #FFFFFF;
+            color: #0B2826;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #0B2826;
+            box-shadow: 0 0 20px rgba(11, 40, 38, 0.2);
+            transform: translateY(-2px);
+        }
+
+        input::placeholder {
+            color: #8EB898;
+        }
+
+        .mode-grid-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            max-width: 600px;
+        }
+
+        .mode-btn {
+            background: white;
+            border: 3px solid #8EB898;
+            padding: 15px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            color: #0B2826;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .mode-btn:hover {
+            border-color: #0B2826;
+            background: #f0f8ff;
+            transform: translateY(-2px);
+        }
+
+        .mode-btn.active {
+            background: #0B2826;
+            color: white;
+            border-color: #0B2826;
+            transform: translateY(-2px);
+        }
+
+        /* Special container for the last 3 buttons */
+        .mode-row-2 {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
+            grid-column: 1 / -1; /* Span all columns */
+        }
+
+        button {
+            background: linear-gradient(135deg, #0B2826 0%, #083432 100%);
+            color: white;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(11, 40, 38, 0.3);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        #result {
+            background: #FFFFFF;
+            padding: 30px;
+            border-radius: 15px;
+            border: 3px solid #8EB898;
+            font-size: 18px;
+            line-height: 1.6;
+            color: #0B2826;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .result-content {
+            width: 100%;
+        }
+
+        .loading {
+            color: #8EB898;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .success {
+            color: #0B2826;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2em;
+            }
+
+            .input-container {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+
+            input {
+                padding: 15px;
+                font-size: 16px;
+            }
+
+            button {
+                padding: 18px 30px;
+                font-size: 18px;
+            }
+
+            .mode-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .mode-row-2 {
+                grid-column: 1 / -1;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .header p {
+                font-size: 1em;
+            }
+
+            .mode-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mode-row-2 {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AI Excuse Generator</h1>
+        <p>Create perfect excuses for any situation</p>
+    </div>
+
+    <div class="main-content">
+        <div class="input-container">
+            <div class="input-group">
+                <input type="text" id="situationInput" placeholder="What's your situation? (e.g. late for work, missed meeting, forgot birthday...)">
+            </div>
+
+            <div class="input-group">
+                <div class="mode-grid-container">
+                    <div class="mode-grid">
+                        <!-- First row - 4 buttons -->
+                        <div class="mode-btn active" data-mode="professional">Professional</div>
+                        <div class="mode-btn" data-mode="funny">Funny</div>
+                        <div class="mode-btn" data-mode="serious">Serious</div>
+                        <div class="mode-btn" data-mode="creative">Creative</div>
+
+                        <!-- Second row - 3 buttons centered -->
+                        <div class="mode-row-2">
+                            <div class="mode-btn" data-mode="formal">Formal</div>
+                            <div class="mode-btn" data-mode="casual">Casual</div>
+                            <div class="mode-btn" data-mode="dramatic">Dramatic</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="getExcuse()">Generate Excuse 🚀</button>
+
+            <div id="result">
+                <div class="result-content">
+                    <p class="loading">Enter your situation and select a mode to generate your perfect excuse!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    let currentMode = 'professional';
+
+    // Mode selection
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentMode = this.getAttribute('data-mode');
+        });
+    });
+
+    async function getExcuse() {
+        const situation = document.getElementById('situationInput').value;
+        const resultDiv = document.getElementById('result');
+
+        if (!situation) {
+            resultDiv.innerHTML = '<div class="result-content"><p class="error">Please describe your situation first!</p></div>';
+            return;
+        }
+
+        resultDiv.innerHTML = '<div class="result-content"><p class="loading">🤔 AI is crafting your perfect excuse...</p></div>';
+
+        try {
+            const response = await fetch('http://localhost:8000/excuse', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    situation: situation,
+                    mode: currentMode
+                })
+            });
+
+            const data = await response.json();
+            resultDiv.innerHTML = `
+                <div class="result-content">
+                    <p class="success"><strong>Your ${currentMode} excuse:</strong><br><br>${data.excuse}</p>
+                </div>
+            `;
+        } catch (error) {
+            resultDiv.innerHTML = '<div class="result-content"><p class="error">Error: Could not connect to the server. Make sure the FastAPI server is running.</p></div>';
+        }
+    }
+    </script>
+</body>
+</html>
